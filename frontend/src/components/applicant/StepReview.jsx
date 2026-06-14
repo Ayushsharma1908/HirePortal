@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useFormCtx } from '../../context/FormContext'
 import { useNavigate } from 'react-router-dom'
 import api from '../../utils/api'
 import toast from 'react-hot-toast'
-import { Loader2, RefreshCw, ShieldCheck } from 'lucide-react'
+import { Loader2, RefreshCw, ShieldCheck, Briefcase, Award, BookOpen } from 'lucide-react'
 
-// ─── Canvas CAPTCHA ────────────────────────────────────────────────────────────
+// ─── Canvas CAPTCHA (Keep same as before) ───
 function generateCode(length = 6) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
   return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
@@ -21,24 +21,16 @@ function CaptchaCanvas({ code }) {
     const W = canvas.width
     const H = canvas.height
 
-    // Background — off-white with slight noise feel
     ctx.fillStyle = '#f5f5f7'
     ctx.fillRect(0, 0, W, H)
 
-    // Random background noise dots
     for (let i = 0; i < 120; i++) {
       ctx.beginPath()
-      ctx.arc(
-        Math.random() * W,
-        Math.random() * H,
-        Math.random() * 1.5,
-        0, Math.PI * 2
-      )
+      ctx.arc(Math.random() * W, Math.random() * H, Math.random() * 1.5, 0, Math.PI * 2)
       ctx.fillStyle = `rgba(28,29,33,${Math.random() * 0.12})`
       ctx.fill()
     }
 
-    // Random interference lines
     for (let i = 0; i < 6; i++) {
       ctx.beginPath()
       ctx.moveTo(Math.random() * W, Math.random() * H)
@@ -52,7 +44,6 @@ function CaptchaCanvas({ code }) {
       ctx.stroke()
     }
 
-    // Draw each character with random tilt, size, color, position jitter
     const fonts = ['bold', '600', '500']
     const colors = ['#1C1D21', '#0d9488', '#854F0B', '#4c1d95', '#0F6E56', '#185FA5']
     const charW = W / (code.length + 1)
@@ -68,18 +59,14 @@ function CaptchaCanvas({ code }) {
       ctx.rotate(angle)
       ctx.font = `${fonts[Math.floor(Math.random() * fonts.length)]} ${size}px Poppins, sans-serif`
       ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)]
-
-      // Subtle shadow for depth
       ctx.shadowColor = 'rgba(0,0,0,0.15)'
       ctx.shadowBlur = 2
       ctx.shadowOffsetX = 1
       ctx.shadowOffsetY = 1
-
       ctx.fillText(ch, 0, 0)
       ctx.restore()
     })
 
-    // Top noise layer over text — very light
     for (let i = 0; i < 40; i++) {
       ctx.beginPath()
       ctx.arc(Math.random() * W, Math.random() * H, Math.random(), 0, Math.PI * 2)
@@ -102,7 +89,7 @@ function CaptchaCanvas({ code }) {
 function CaptchaBox({ onVerify }) {
   const [code, setCode] = useState(() => generateCode())
   const [input, setInput] = useState('')
-  const [status, setStatus] = useState('idle') // idle | success | error
+  const [status, setStatus] = useState('idle')
   const [attempts, setAttempts] = useState(0)
 
   const refresh = () => {
@@ -120,7 +107,6 @@ function CaptchaBox({ onVerify }) {
       setStatus('error')
       setAttempts(a => a + 1)
       onVerify(false)
-      // Auto-refresh after 2 failed attempts
       if (attempts >= 1) {
         setTimeout(() => {
           setCode(generateCode())
@@ -130,10 +116,6 @@ function CaptchaBox({ onVerify }) {
         }, 900)
       }
     }
-  }
-
-  const handleKey = (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); verify() }
   }
 
   return (
@@ -147,13 +129,11 @@ function CaptchaBox({ onVerify }) {
           type="button"
           onClick={refresh}
           className="flex items-center gap-1 text-xs text-ink-400 hover:text-ink transition-colors"
-          title="Generate new CAPTCHA"
         >
           <RefreshCw size={11} /> New code
         </button>
       </div>
 
-      {/* Canvas */}
       <div className="flex items-center gap-3 mb-3">
         <div className="relative">
           <CaptchaCanvas code={code} />
@@ -164,22 +144,19 @@ function CaptchaBox({ onVerify }) {
           )}
         </div>
         <p className="text-xs text-ink-300 leading-relaxed max-w-[100px]">
-          Type the characters shown — case-sensitive
+          Type the characters — case-sensitive
         </p>
       </div>
 
-      {/* Input + verify */}
       {status !== 'success' && (
         <div className="flex gap-2">
           <input
-            className={`input flex-1 text-sm tracking-widest font-medium transition-colors ${
-              status === 'error' ? 'border-red-300 bg-red-50' : ''
-            }`}
-            placeholder="Enter code here"
+            className={`input flex-1 text-sm tracking-widest font-medium ${status === 'error' ? 'border-red-300 bg-red-50' : ''}`}
+            placeholder="Enter code"
             value={input}
             maxLength={8}
             onChange={e => { setInput(e.target.value); if (status === 'error') setStatus('idle') }}
-            onKeyDown={handleKey}
+            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); verify() } }}
             autoComplete="off"
             spellCheck={false}
           />
@@ -194,28 +171,25 @@ function CaptchaBox({ onVerify }) {
         </div>
       )}
 
-      {/* Feedback */}
       {status === 'error' && (
-        <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
-          ✗ Incorrect — try again
-          {attempts >= 1 && <span className="text-ink-300">(refreshing…)</span>}
-        </p>
+        <p className="text-xs text-red-500 mt-1.5">✗ Incorrect — try again {attempts >= 1 && '(refreshing…)'}</p>
       )}
       {status === 'success' && (
-        <p className="text-xs text-teal mt-1.5 flex items-center gap-1 font-medium">
-          ✓ Verified successfully
-        </p>
+        <p className="text-xs text-teal mt-1.5 font-medium">✓ Verified successfully</p>
       )}
     </div>
   )
 }
 
-// ─── Review Row ────────────────────────────────────────────────────────────────
-function ReviewRow({ label, value }) {
+// ─── Review Row Component ───
+function ReviewRow({ label, value, icon }) {
   if (!value || (Array.isArray(value) && value.length === 0)) return null
   return (
     <div className="flex gap-3 py-2.5 border-b border-ink-100 last:border-0">
-      <span className="text-xs text-ink-400 w-36 flex-shrink-0">{label}</span>
+      <span className="text-xs text-ink-400 w-36 flex-shrink-0 flex items-center gap-1.5">
+        {icon}
+        {label}
+      </span>
       <span className="text-xs text-ink font-medium">
         {Array.isArray(value) ? value.join(', ') : value}
       </span>
@@ -223,7 +197,7 @@ function ReviewRow({ label, value }) {
   )
 }
 
-// ─── Main Step ─────────────────────────────────────────────────────────────────
+// ─── Main Step ───
 export default function StepReview({ onBack }) {
   const { formData, clearForm } = useFormCtx()
   const [verified, setVerified] = useState(false)
@@ -255,38 +229,123 @@ export default function StepReview({ onBack }) {
       <h2 className="text-base font-semibold text-ink mb-1">Review & Submit</h2>
       <p className="text-xs text-ink-400 mb-6">Verify your information before submitting</p>
 
-      <div className="border border-ink-100 p-4 mb-4">
-        <p className="text-xs uppercase tracking-wide font-medium text-ink-400 mb-2">Personal</p>
-        <ReviewRow label="Name"        value={`${formData.firstName} ${formData.lastName}`} />
-        <ReviewRow label="Email"       value={formData.email} />
-        <ReviewRow label="Phone"       value={formData.phone} />
-        <ReviewRow label="Location"    value={`${formData.city}, ${formData.state}`} />
+      {/* Personal Info Section */}
+      <div className="border border-ink-200 p-5 mb-4 bg-white">
+        <p className="text-xs uppercase tracking-wide font-semibold text-ink-400 mb-3">Personal Information</p>
+        <ReviewRow label="Name" value={`${formData.firstName} ${formData.lastName}`} />
+        <ReviewRow label="Email" value={formData.email} />
+        <ReviewRow label="Phone" value={formData.phone} />
+        <ReviewRow label="Location" value={`${formData.city}, ${formData.state}`} />
         <ReviewRow label="Applying For" value={`${formData.jobRole} — ${formData.department}`} />
-        <ReviewRow label="Experience"  value={formData.experienceLevel} />
+        <ReviewRow label="Experience Level" value={formData.experienceLevel} />
       </div>
 
-      <div className="border border-ink-100 p-4 mb-4">
-        <p className="text-xs uppercase tracking-wide font-medium text-ink-400 mb-2">Education</p>
-        <ReviewRow label="Institution" value={formData.institution} />
-        <ReviewRow label="Degree"      value={`${formData.degree}, ${formData.fieldOfStudy}`} />
-        <ReviewRow label="Grade"       value={formData.grade} />
-        <ReviewRow label="Year"        value={`${formData.startYear} – ${formData.endYear}`} />
+      {/* Education Section */}
+      <div className="border border-ink-200 p-5 mb-4 bg-white">
+        <p className="text-xs uppercase tracking-wide font-semibold text-ink-400 mb-3 flex items-center gap-2">
+          <BookOpen size={12} />
+          Education
+        </p>
+        {formData.educations?.map((edu, idx) => (
+          <div key={edu.id || idx} className="mb-3 pb-3 border-b border-ink-100 last:mb-0 last:pb-0 last:border-0">
+            <p className="text-sm font-medium text-ink">
+              {edu.degree} in {edu.fieldOfStudy}
+            </p>
+            <p className="text-xs text-ink-400">
+              {edu.institution} · {edu.startYear} – {edu.endYear} · Grade: {edu.grade || 'N/A'}
+            </p>
+          </div>
+        ))}
+        
+        {formData.additionalQualifications?.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-ink-100">
+            <p className="text-xs font-medium text-ink mb-2 flex items-center gap-2">
+              <Award size={12} />
+              Additional Qualifications
+            </p>
+            {formData.additionalQualifications.map((qual) => (
+              <div key={qual.id} className="text-xs text-ink-400 mb-1">
+                <span className="font-medium text-ink">{qual.title}</span>
+                {qual.issuer && ` · ${qual.issuer}`}
+                {qual.date && ` · ${qual.date}`}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="border border-ink-100 p-4 mb-4">
-        <p className="text-xs uppercase tracking-wide font-medium text-ink-400 mb-2">Skills</p>
-        <ReviewRow label="Technical"     value={formData.technicalSkills} />
-        <ReviewRow label="Soft Skills"   value={formData.softSkills} />
-        <ReviewRow label="Certifications" value={formData.certifications} />
+      {/* Skills Section */}
+      <div className="border border-ink-200 p-5 mb-4 bg-white">
+        <p className="text-xs uppercase tracking-wide font-semibold text-ink-400 mb-3">Skills & Expertise</p>
+        
+        <div className="mb-3">
+          <p className="text-xs font-medium text-ink mb-1.5">Technical Skills</p>
+          <div className="flex flex-wrap gap-1.5">
+            {formData.technicalSkills?.map(skill => (
+              <span key={skill} className="px-2 py-1 bg-ink-50 border border-ink-200 text-ink text-xs">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {formData.softSkills?.length > 0 && (
+          <div className="mb-3">
+            <p className="text-xs font-medium text-ink mb-1.5">Soft Skills</p>
+            <div className="flex flex-wrap gap-1.5">
+              {formData.softSkills?.map(skill => (
+                <span key={skill} className="px-2 py-1 bg-teal-50 border border-teal-200 text-teal-dark text-xs">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {formData.certifications?.length > 0 && (
+          <div>
+            <p className="text-xs font-medium text-ink mb-1.5">Certifications</p>
+            <div className="flex flex-wrap gap-1.5">
+              {formData.certifications?.map(cert => (
+                <span key={cert} className="px-2 py-1 bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+                  {cert}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      <div className="border border-ink-100 p-4 mb-5">
-        <p className="text-xs uppercase tracking-wide font-medium text-ink-400 mb-2">Documents</p>
-        <ReviewRow label="Resume"   value={formData.resume?.name || 'Attached'} />
-        {formData.githubUrl    && <ReviewRow label="GitHub"    value={formData.githubUrl} />}
-        {formData.linkedinUrl  && <ReviewRow label="LinkedIn"  value={formData.linkedinUrl} />}
+      {/* Experience Section */}
+      {formData.experiences?.length > 0 && (
+        <div className="border border-ink-200 p-5 mb-4 bg-white">
+          <p className="text-xs uppercase tracking-wide font-semibold text-ink-400 mb-3 flex items-center gap-2">
+            <Briefcase size={12} />
+            Work Experience
+          </p>
+          {formData.experiences.map((exp, idx) => (
+            <div key={exp.id || idx} className="mb-3 pb-3 border-b border-ink-100 last:mb-0 last:pb-0 last:border-0">
+              <p className="text-sm font-medium text-ink">{exp.jobTitle}</p>
+              <p className="text-xs text-ink-400">
+                {exp.company} · {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
+              </p>
+              {exp.description && (
+                <p className="text-xs text-ink-400 mt-1">{exp.description}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Documents Section */}
+      <div className="border border-ink-200 p-5 mb-5 bg-white">
+        <p className="text-xs uppercase tracking-wide font-semibold text-ink-400 mb-3">Documents & Links</p>
+        <ReviewRow label="Resume" value={formData.resume?.name || 'Attached'} />
+        {formData.githubUrl && <ReviewRow label="GitHub" value={formData.githubUrl} />}
+        {formData.linkedinUrl && <ReviewRow label="LinkedIn" value={formData.linkedinUrl} />}
       </div>
 
+      {/* CAPTCHA */}
       <div className="mb-6">
         <CaptchaBox onVerify={setVerified} />
       </div>
@@ -299,7 +358,7 @@ export default function StepReview({ onBack }) {
           type="button"
           onClick={handleSubmit}
           disabled={!verified || submitting}
-          className="btn-teal flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-teal flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed px-8"
         >
           {submitting
             ? <><Loader2 size={14} className="animate-spin" /> Submitting...</>
