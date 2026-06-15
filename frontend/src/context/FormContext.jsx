@@ -7,7 +7,9 @@ const STORAGE_KEY = 'job_portal_draft'
 const initialData = {
   firstName: '', lastName: '', email: '', phone: '', dob: '', gender: '', address: '', city: '', state: '',
   department: '', jobRole: '', experienceLevel: 'Entry Level',
-  institution: '', degree: '', fieldOfStudy: '', grade: '', startYear: '', endYear: '',
+  educations: [{ id: Date.now(), institution: '', degree: '', fieldOfStudy: '', grade: '', startYear: '', endYear: '' }],
+  additionalQualifications: [],
+  experiences: [],
   technicalSkills: [], softSkills: [], certifications: [], languages: [],
   githubUrl: '', linkedinUrl: '', portfolioUrl: '', coverLetter: '',
   resume: null, profileImage: null,

@@ -209,8 +209,11 @@ export default function StepReview({ onBack }) {
     setSubmitting(true)
     try {
       const fd = new FormData()
-      const { resume, profileImage, ...rest } = formData
-      fd.append('data', JSON.stringify(rest))
+      // Destructure files and the frontend-only 'educations' (plural) key
+      const { resume, profileImage, educations, ...rest } = formData
+      // Backend schema expects 'education' (singular); map it here
+      const payload = { ...rest, education: educations || [] }
+      fd.append('data', JSON.stringify(payload))
       if (resume) fd.append('resume', resume)
       if (profileImage) fd.append('profileImage', profileImage)
 

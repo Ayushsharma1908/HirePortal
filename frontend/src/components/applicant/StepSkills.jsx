@@ -329,7 +329,7 @@ export default function StepSkillsAndExperience({ onNext, onBack }) {
         )}
       </div>
 
-      {/* ── Certifications ── */}
+      {/* ── Certifications ──
       <div className="border-t border-ink-200 pt-5 mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Award size={16} className="text-teal" />
@@ -361,7 +361,7 @@ export default function StepSkillsAndExperience({ onNext, onBack }) {
             <Plus size={12} /> Add
           </button>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex justify-between pt-2">
         <button type="button" onClick={onBack} className="btn-outline">← Back</button>
