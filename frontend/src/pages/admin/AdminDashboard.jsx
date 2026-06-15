@@ -1,24 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Users,
-  FileText,
-  Clock,
-  CheckCircle,
-  XCircle,
-  RefreshCw,
-  Plus,
-  Search,
-  LogOut,
-  Briefcase,
-  ChevronDown,
-  Download,
-  ExternalLink,
-  X,
-  Star,
-  AlertCircle,
-  BarChart2,
-  UserCog,
+  Users, FileText, Clock, CheckCircle, XCircle, RefreshCw, Plus,
+  LogOut, Briefcase, ChevronDown, Download, ExternalLink, X, Star,
+  BarChart2, UserCog,
+  User, Mail, Phone, MapPin, Calendar, Github, Linkedin, Globe,
+  Zap, Award, GraduationCap, MessageSquare, CheckCircle2,
+  ThumbsUp, ThumbsDown, Loader2, BookOpen,
 } from "lucide-react";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
@@ -470,52 +458,329 @@ function ApplicantPanel({ app, onClose, onStatusChange }) {
 
           {tab === "skills" && (
             <div className="space-y-5 animate-fade-in">
+              {/* Skills Overview Header */}
+              <div className="bg-gradient-to-br from-ink-50 to-white border border-ink-100 p-4 rounded-2xl">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-ink">Skills Overview</h3>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-ink-400">
+                      {[
+                        ...(app.technicalSkills || []),
+                        ...(app.softSkills || []),
+                        ...(app.certifications || []),
+                      ].length}{" "}
+                      total
+                    </span>
+                  </div>
+                </div>
+
+                {/* Skill Distribution Bar */}
+                <div className="h-1.5 bg-ink-100 rounded-full overflow-hidden flex">
+                  {app.technicalSkills?.length > 0 && (
+                    <div
+                      className="h-full bg-ink"
+                      style={{
+                        width: `${(app.technicalSkills.length /
+                          ((app.technicalSkills?.length || 0) +
+                            (app.softSkills?.length || 0) +
+                            (app.certifications?.length || 0))) * 100}%`
+                      }}
+                    />
+                  )}
+                  {app.softSkills?.length > 0 && (
+                    <div
+                      className="h-full bg-teal"
+                      style={{
+                        width: `${(app.softSkills.length /
+                          ((app.technicalSkills?.length || 0) +
+                            (app.softSkills?.length || 0) +
+                            (app.certifications?.length || 0))) * 100}%`
+                      }}
+                    />
+                  )}
+                  {app.certifications?.length > 0 && (
+                    <div
+                      className="h-full bg-amber"
+                      style={{
+                        width: `${(app.certifications.length /
+                          ((app.technicalSkills?.length || 0) +
+                            (app.softSkills?.length || 0) +
+                            (app.certifications?.length || 0))) * 100}%`
+                      }}
+                    />
+                  )}
+                </div>
+
+                {/* Legend */}
+                <div className="flex gap-4 mt-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-ink" />
+                    <span className="text-[10px] text-ink-400">Technical</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-teal" />
+                    <span className="text-[10px] text-ink-400">Soft</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber" />
+                    <span className="text-[10px] text-ink-400">Certifications</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Technical Skills Section */}
               {app.technicalSkills?.length > 0 && (
-                <InfoBlock title="Technical Skills">
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {app.technicalSkills.map((s) => (
-                      <span
-                        key={s}
-                        className="px-2.5 py-1 bg-ink text-white text-xs"
-                      >
-                        {s}
-                      </span>
-                    ))}
+                <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden shadow-soft">
+                  <div className="px-4 py-3 border-b border-ink-50 bg-ink-50/50">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 bg-ink rounded-lg flex items-center justify-center">
+                        <Zap size={12} className="text-white" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-semibold text-ink">Technical Skills</h4>
+                        <p className="text-[10px] text-ink-400">
+                          {app.technicalSkills.length} skill{app.technicalSkills.length > 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </InfoBlock>
+                  <div className="p-4">
+                    <div className="flex flex-wrap gap-2">
+                      {app.technicalSkills.map((skill, index) => (
+                        <div
+                          key={skill}
+                          className="group relative"
+                        >
+                          <span className="inline-flex items-center gap-1.5 px-3 py-2 bg-ink text-white text-xs font-medium rounded-xl hover:bg-ink-800 transition-all cursor-default shadow-sm hover:shadow-md">
+                            <span className="w-1 h-1 bg-white/50 rounded-full" />
+                            {skill}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               )}
+
+              {/* Soft Skills Section */}
               {app.softSkills?.length > 0 && (
-                <InfoBlock title="Soft Skills">
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {app.softSkills.map((s) => (
-                      <span
-                        key={s}
-                        className="px-2.5 py-1 bg-ink-50 border border-ink-100 text-ink text-xs"
-                      >
-                        {s}
-                      </span>
-                    ))}
+                <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden shadow-soft">
+                  <div className="px-4 py-3 border-b border-ink-50 bg-teal-50/50">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 bg-teal rounded-lg flex items-center justify-center">
+                        <Users size={12} className="text-white" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-semibold text-teal-dark">Soft Skills</h4>
+                        <p className="text-[10px] text-teal-600">
+                          {app.softSkills.length} skill{app.softSkills.length > 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </InfoBlock>
+                  <div className="p-4">
+                    <div className="flex flex-wrap gap-2">
+                      {app.softSkills.map((skill) => (
+                        <span
+                          key={skill}
+                          className="inline-flex items-center gap-1.5 px-3 py-2 bg-teal-50 border border-teal-200 text-teal-700 text-xs font-medium rounded-xl hover:bg-teal-100 hover:border-teal-300 transition-all cursor-default shadow-sm"
+                        >
+                          <span className="w-1 h-1 bg-teal rounded-full" />
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               )}
+
+              {/* Certifications Section */}
               {app.certifications?.length > 0 && (
-                <InfoBlock title="Certifications">
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {app.certifications.map((c) => (
-                      <span
-                        key={c}
-                        className="px-2.5 py-1 bg-teal-muted border border-teal/20 text-teal-dark text-xs"
+                <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden shadow-soft">
+                  <div className="px-4 py-3 border-b border-ink-50 bg-amber-50/50">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 bg-amber rounded-lg flex items-center justify-center">
+                        <Award size={12} className="text-white" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-semibold text-amber-900">Certifications</h4>
+                        <p className="text-[10px] text-amber-700">
+                          {app.certifications.length} certification{app.certifications.length > 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex flex-wrap gap-2">
+                      {app.certifications.map((cert) => (
+                        <span
+                          key={cert}
+                          className="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium rounded-xl hover:bg-amber-100 hover:border-amber-300 transition-all cursor-default shadow-sm"
+                        >
+                          <Award size={10} className="text-amber-500" />
+                          {cert}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Languages Section (if available) */}
+              {app.languages?.length > 0 && (
+                <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden shadow-soft">
+                  <div className="px-4 py-3 border-b border-ink-50 bg-purple-50/50">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 bg-purple-500 rounded-lg flex items-center justify-center">
+                        <MessageSquare size={12} className="text-white" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-semibold text-purple-900">Languages</h4>
+                        <p className="text-[10px] text-purple-700">
+                          {app.languages.length} language{app.languages.length > 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="grid grid-cols-2 gap-2">
+                      {app.languages.map((lang, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between px-3 py-2 bg-purple-50 border border-purple-100 rounded-xl"
+                        >
+                          <span className="text-xs font-medium text-purple-900">
+                            {typeof lang === 'string' ? lang : lang.name}
+                          </span>
+                          {typeof lang === 'object' && lang.proficiency && (
+                            <span className="text-[10px] text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">
+                              {lang.proficiency}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Experience Tags (if available) */}
+              {app.experiences?.length > 0 && (
+                <div className="bg-white border border-ink-100 rounded-2xl overflow-hidden shadow-soft">
+                  <div className="px-4 py-3 border-b border-ink-50 bg-blue-50/50">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center">
+                        <Briefcase size={12} className="text-white" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-semibold text-blue-900">Experience Highlights</h4>
+                        <p className="text-[10px] text-blue-700">
+                          {app.experiences.length} role{app.experiences.length > 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    {app.experiences.map((exp, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-blue-50/50 border border-blue-100 rounded-xl p-3"
                       >
-                        {c}
-                      </span>
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <p className="text-xs font-semibold text-blue-900">
+                              {exp.jobTitle}
+                            </p>
+                            <p className="text-[11px] text-blue-700">{exp.company}</p>
+                          </div>
+                          <span className="text-[10px] text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">
+                            {exp.startDate} - {exp.currentlyWorking ? 'Present' : exp.endDate}
+                          </span>
+                        </div>
+                        {exp.skills?.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {exp.skills.map((skill) => (
+                              <span
+                                key={skill}
+                                className="px-2 py-0.5 bg-white border border-blue-200 text-blue-700 text-[10px] rounded-lg"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
-                </InfoBlock>
+                </div>
               )}
-              {!app.technicalSkills?.length && !app.softSkills?.length && (
-                <p className="text-xs text-ink-400 py-8 text-center">
-                  No skills recorded
-                </p>
+
+              {/* Empty State */}
+              {!app.technicalSkills?.length &&
+                !app.softSkills?.length &&
+                !app.certifications?.length &&
+                !app.languages?.length && (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-ink-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Zap size={24} className="text-ink-300" />
+                    </div>
+                    <p className="text-sm font-medium text-ink-400 mb-1">No Skills Recorded</p>
+                    <p className="text-xs text-ink-300 max-w-xs mx-auto">
+                      This applicant hasn't added any skills, certifications, or languages yet.
+                    </p>
+                  </div>
+                )}
+
+              {/* Skill Match Score (Optional Feature) */}
+              {app.technicalSkills?.length > 0 && (
+                <div className="bg-gradient-to-r from-ink to-ink-800 text-white p-5 rounded-2xl shadow-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-xs font-semibold text-white/90">Skill Match Potential</h4>
+                    <span className="text-[10px] text-white/60">Based on profile</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <div className="flex justify-between text-[10px] text-white/70 mb-1">
+                        <span>Technical Depth</span>
+                        <span>{Math.min((app.technicalSkills.length / 10) * 100, 100).toFixed(0)}%</span>
+                      </div>
+                      <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-white rounded-full transition-all duration-700"
+                          style={{
+                            width: `${Math.min((app.technicalSkills.length / 10) * 100, 100)}%`
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[10px] text-white/70 mb-1">
+                        <span>Profile Completeness</span>
+                        <span>{[
+                          app.technicalSkills?.length > 0,
+                          app.softSkills?.length > 0,
+                          app.certifications?.length > 0,
+                          app.experiences?.length > 0,
+                          app.education?.length > 0,
+                        ].filter(Boolean).length * 20}%</span>
+                      </div>
+                      <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-teal rounded-full transition-all duration-700"
+                          style={{
+                            width: `${[
+                              app.technicalSkills?.length > 0,
+                              app.softSkills?.length > 0,
+                              app.certifications?.length > 0,
+                              app.experiences?.length > 0,
+                              app.education?.length > 0,
+                            ].filter(Boolean).length * 20}%`
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           )}
@@ -632,7 +897,7 @@ export default function AdminDashboard() {
     api
       .get("/applications/stats/summary")
       .then((r) => setStats(r.data))
-      .catch(() => {});
+      .catch(() => { });
   };
 
   const filteredApps = applications;
@@ -723,11 +988,10 @@ export default function AdminDashboard() {
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id)}
-              className={`flex items-center gap-2 px-4 py-2 text-xs rounded-xl transition-all ${
-                activeTab === t.id
-                  ? "bg-ink text-white shadow-soft"
-                  : "text-ink-400 hover:text-ink hover:bg-ink-50"
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 text-xs rounded-xl transition-all ${activeTab === t.id
+                ? "bg-ink text-white shadow-soft"
+                : "text-ink-400 hover:text-ink hover:bg-ink-50"
+                }`}
             >
               <t.icon size={13} />
               {t.label}
@@ -902,11 +1166,10 @@ export default function AdminDashboard() {
                   <button
                     key={s}
                     onClick={() => setFilterStatus(s)}
-                    className={`px-3 py-1.5 text-xs rounded-xl border transition-all flex items-center gap-1.5 ${
-                      active
-                        ? "bg-ink text-white border-ink shadow-soft"
-                        : "border-transparent text-ink-400 hover:text-ink hover:bg-ink-50"
-                    }`}
+                    className={`px-3 py-1.5 text-xs rounded-xl border transition-all flex items-center gap-1.5 ${active
+                      ? "bg-ink text-white border-ink shadow-soft"
+                      : "border-transparent text-ink-400 hover:text-ink hover:bg-ink-50"
+                      }`}
                   >
                     {s}
                     <span
@@ -1141,11 +1404,10 @@ export default function AdminDashboard() {
                         </p>
                       </div>
                       <span
-                        className={`text-xs px-2.5 py-1 flex-shrink-0 rounded-full border ${
-                          job.isActive
-                            ? "bg-teal-muted text-teal-dark border-teal/20"
-                            : "bg-ink-100 text-ink-400 border-ink-100"
-                        }`}
+                        className={`text-xs px-2.5 py-1 flex-shrink-0 rounded-full border ${job.isActive
+                          ? "bg-teal-muted text-teal-dark border-teal/20"
+                          : "bg-ink-100 text-ink-400 border-ink-100"
+                          }`}
                       >
                         {job.isActive ? "Active" : "Closed"}
                       </span>
