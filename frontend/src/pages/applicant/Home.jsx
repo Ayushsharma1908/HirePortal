@@ -63,15 +63,27 @@ export default function Home() {
   useEffect(() => {
     api
       .get("/jobs")
-      .then((r) => setJobs(r.data))
+      .then((r) => {
+        console.log("API Response:", r.data);
+
+        setJobs(
+          Array.isArray(r.data)
+            ? r.data
+            : Array.isArray(r.data.jobs)
+              ? r.data.jobs
+              : [],
+        );
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
+  const safeJobs = Array.isArray(jobs) ? jobs : [];
+
   const filtered =
     activeDept === "All"
-      ? jobs
-      : jobs.filter((j) => j.department === activeDept);
+      ? safeJobs
+      : safeJobs.filter((j) => j.department === activeDept);
 
   return (
     <div className="min-h-screen bg-ink-50">
@@ -217,7 +229,6 @@ export default function Home() {
         </div>
       </section>
 
-      
       {/* Job listings */}
       <section id="openings" className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
@@ -285,9 +296,8 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filtered.map((job) => (
-                <JobCard key={job._id} job={job} />
-              ))}
+              {safeJobs.length > 0 &&
+                filtered.map((job) => <JobCard key={job._id} job={job} />)}
             </div>
           )}
         </div>
