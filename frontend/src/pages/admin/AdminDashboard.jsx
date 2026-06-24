@@ -6,7 +6,7 @@ import {
   BarChart2, UserCog,
   User, Mail, Phone, MapPin, Calendar, Github, Linkedin, Globe,
   Zap, Award, GraduationCap, MessageSquare, CheckCircle2,
-  ThumbsUp, ThumbsDown, Loader2, BookOpen,
+  ThumbsUp, ThumbsDown, Loader2, BookOpen, Search, AlertCircle,
 } from "lucide-react";
 import api from "../../utils/api";
 import toast from "react-hot-toast";
