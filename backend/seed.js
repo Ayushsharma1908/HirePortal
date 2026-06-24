@@ -26,7 +26,7 @@ const demoApplications = [
   {
     firstName: 'Rahul', lastName: 'Verma', email: 'rahul.verma@email.com',
     phone: '9988776655', gender: 'Male', city: 'Delhi', state: 'Delhi',
-    department: 'Data Science', jobRole: 'Data Analyst', experienceLevel: 'Entry Level',
+    department: 'Engineering', jobRole: 'Data Analyst', experienceLevel: 'Entry Level',
     education: [{ institution: 'Delhi University', degree: 'M.Sc', fieldOfStudy: 'Statistics', grade: '7.8 CGPA', startYear: '2020', endYear: '2022' }],
     technicalSkills: ['Python', 'SQL', 'Tableau', 'Machine Learning'], softSkills: ['Analytical thinking', 'Problem solving'],
     githubUrl: 'https://github.com/rahul',
@@ -56,7 +56,7 @@ const demoJobs = [
   { title: 'Frontend Developer', department: 'Engineering', location: 'Remote', type: 'Full-time', experienceLevel: 'Mid Level', description: 'Build modern UIs with React and TypeScript.', requirements: ['React', 'TypeScript', '3+ years experience'], salary: '₹12-18 LPA' },
   { title: 'Backend Developer', department: 'Engineering', location: 'Bangalore', type: 'Full-time', experienceLevel: 'Senior', description: 'Design and build scalable APIs and microservices.', requirements: ['Node.js', 'MongoDB', '5+ years experience'], salary: '₹18-28 LPA' },
   { title: 'UI/UX Designer', department: 'Design', location: 'Mumbai', type: 'Full-time', experienceLevel: 'Mid Level', description: 'Craft user-centered designs that delight users.', requirements: ['Figma', 'Prototyping', 'User Research'], salary: '₹8-14 LPA' },
-  { title: 'Data Analyst', department: 'Data Science', location: 'Remote', type: 'Full-time', experienceLevel: 'Entry Level', description: 'Analyze data to drive business insights.', requirements: ['Python', 'SQL', 'Tableau'], salary: '₹6-10 LPA' },
+  { title: 'Data Analyst', department: 'Engineering', location: 'Remote', type: 'Full-time', experienceLevel: 'Entry Level', description: 'Analyze data to drive business insights.', requirements: ['Python', 'SQL', 'Tableau'], salary: '₹6-10 LPA' },
   { title: 'Digital Marketer', department: 'Marketing', location: 'Delhi', type: 'Full-time', experienceLevel: 'Mid Level', description: 'Drive growth through digital channels.', requirements: ['SEO/SEM', 'Content Strategy', 'Analytics'], salary: '₹7-12 LPA' },
 ];
 
