@@ -5,7 +5,7 @@ import api from '../../utils/api'
 import toast from 'react-hot-toast'
 import { Loader2, RefreshCw, ShieldCheck, Briefcase, Award, BookOpen } from 'lucide-react'
 
-// ─── Canvas CAPTCHA (Keep same as before) ───
+// ─── Canvas CAPTCHA ───
 function generateCode(length = 6) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'
   return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
@@ -80,7 +80,7 @@ function CaptchaCanvas({ code }) {
       ref={canvasRef}
       width={220}
       height={64}
-      className="border border-ink-200 select-none"
+      className="border border-ink-200 select-none w-full max-w-[220px]"
       style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
     />
   )
@@ -119,7 +119,7 @@ function CaptchaBox({ onVerify }) {
   }
 
   return (
-    <div className="border border-ink-200 p-4 bg-white">
+    <div className="border border-ink-200 p-3 sm:p-4 bg-white">
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs font-medium text-ink uppercase tracking-wide flex items-center gap-1.5">
           <ShieldCheck size={12} className="text-teal" />
@@ -134,8 +134,9 @@ function CaptchaBox({ onVerify }) {
         </button>
       </div>
 
-      <div className="flex items-center gap-3 mb-3">
-        <div className="relative">
+      {/* Stack vertically on very small screens, side-by-side otherwise */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-3">
+        <div className="relative flex-shrink-0">
           <CaptchaCanvas code={code} />
           {status === 'success' && (
             <div className="absolute inset-0 bg-teal/10 border border-teal flex items-center justify-center">
@@ -143,7 +144,7 @@ function CaptchaBox({ onVerify }) {
             </div>
           )}
         </div>
-        <p className="text-xs text-ink-300 leading-relaxed max-w-[100px]">
+        <p className="text-xs text-ink-300 leading-relaxed">
           Type the characters — case-sensitive
         </p>
       </div>
@@ -164,7 +165,7 @@ function CaptchaBox({ onVerify }) {
             type="button"
             onClick={verify}
             disabled={!input.trim()}
-            className="btn-primary px-4 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="btn-primary px-3 sm:px-4 text-sm disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
           >
             Verify
           </button>
@@ -181,16 +182,16 @@ function CaptchaBox({ onVerify }) {
   )
 }
 
-// ─── Review Row Component ───
+// ─── Review Row Component (RESPONSIVE) ───
 function ReviewRow({ label, value, icon }) {
   if (!value || (Array.isArray(value) && value.length === 0)) return null
   return (
-    <div className="flex gap-3 py-2.5 border-b border-ink-100 last:border-0">
-      <span className="text-xs text-ink-400 w-36 flex-shrink-0 flex items-center gap-1.5">
+    <div className="flex flex-col sm:flex-row gap-0.5 sm:gap-3 py-2.5 border-b border-ink-100 last:border-0">
+      <span className="text-xs text-ink-400 sm:w-36 flex-shrink-0 flex items-center gap-1.5">
         {icon}
         {label}
       </span>
-      <span className="text-xs text-ink font-medium">
+      <span className="text-xs text-ink font-medium break-words min-w-0">
         {Array.isArray(value) ? value.join(', ') : value}
       </span>
     </div>
@@ -209,9 +210,7 @@ export default function StepReview({ onBack }) {
     setSubmitting(true)
     try {
       const fd = new FormData()
-      // Destructure files and the frontend-only 'educations' (plural) key
       const { resume, profileImage, educations, ...rest } = formData
-      // Backend schema expects 'education' (singular); map it here
       const payload = { ...rest, education: educations || [] }
       fd.append('data', JSON.stringify(payload))
       if (resume) fd.append('resume', resume)
@@ -228,12 +227,12 @@ export default function StepReview({ onBack }) {
   }
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in w-full max-w-full overflow-hidden">
       <h2 className="text-base font-semibold text-ink mb-1">Review & Submit</h2>
       <p className="text-xs text-ink-400 mb-6">Verify your information before submitting</p>
 
       {/* Personal Info Section */}
-      <div className="border border-ink-200 p-5 mb-4 bg-white">
+      <div className="border border-ink-200 p-4 sm:p-5 mb-4 bg-white overflow-hidden">
         <p className="text-xs uppercase tracking-wide font-semibold text-ink-400 mb-3">Personal Information</p>
         <ReviewRow label="Name" value={`${formData.firstName} ${formData.lastName}`} />
         <ReviewRow label="Email" value={formData.email} />
@@ -244,22 +243,22 @@ export default function StepReview({ onBack }) {
       </div>
 
       {/* Education Section */}
-      <div className="border border-ink-200 p-5 mb-4 bg-white">
+      <div className="border border-ink-200 p-4 sm:p-5 mb-4 bg-white overflow-hidden">
         <p className="text-xs uppercase tracking-wide font-semibold text-ink-400 mb-3 flex items-center gap-2">
           <BookOpen size={12} />
           Education
         </p>
         {formData.educations?.map((edu, idx) => (
           <div key={edu.id || idx} className="mb-3 pb-3 border-b border-ink-100 last:mb-0 last:pb-0 last:border-0">
-            <p className="text-sm font-medium text-ink">
+            <p className="text-sm font-medium text-ink break-words">
               {edu.degree} in {edu.fieldOfStudy}
             </p>
-            <p className="text-xs text-ink-400">
+            <p className="text-xs text-ink-400 break-words mt-0.5">
               {edu.institution} · {edu.startYear} – {edu.endYear} · Grade: {edu.grade || 'N/A'}
             </p>
           </div>
         ))}
-        
+
         {formData.additionalQualifications?.length > 0 && (
           <div className="mt-3 pt-3 border-t border-ink-100">
             <p className="text-xs font-medium text-ink mb-2 flex items-center gap-2">
@@ -267,7 +266,7 @@ export default function StepReview({ onBack }) {
               Additional Qualifications
             </p>
             {formData.additionalQualifications.map((qual) => (
-              <div key={qual.id} className="text-xs text-ink-400 mb-1">
+              <div key={qual.id} className="text-xs text-ink-400 mb-1 break-words">
                 <span className="font-medium text-ink">{qual.title}</span>
                 {qual.issuer && ` · ${qual.issuer}`}
                 {qual.date && ` · ${qual.date}`}
@@ -278,14 +277,14 @@ export default function StepReview({ onBack }) {
       </div>
 
       {/* Skills Section */}
-      <div className="border border-ink-200 p-5 mb-4 bg-white">
+      <div className="border border-ink-200 p-4 sm:p-5 mb-4 bg-white overflow-hidden">
         <p className="text-xs uppercase tracking-wide font-semibold text-ink-400 mb-3">Skills & Expertise</p>
-        
+
         <div className="mb-3">
           <p className="text-xs font-medium text-ink mb-1.5">Technical Skills</p>
           <div className="flex flex-wrap gap-1.5">
             {formData.technicalSkills?.map(skill => (
-              <span key={skill} className="px-2 py-1 bg-ink-50 border border-ink-200 text-ink text-xs">
+              <span key={skill} className="px-2 py-1 bg-ink-50 border border-ink-200 text-ink text-xs break-all">
                 {skill}
               </span>
             ))}
@@ -297,7 +296,7 @@ export default function StepReview({ onBack }) {
             <p className="text-xs font-medium text-ink mb-1.5">Soft Skills</p>
             <div className="flex flex-wrap gap-1.5">
               {formData.softSkills?.map(skill => (
-                <span key={skill} className="px-2 py-1 bg-teal-50 border border-teal-200 text-teal-dark text-xs">
+                <span key={skill} className="px-2 py-1 bg-teal-50 border border-teal-200 text-teal-dark text-xs break-all">
                   {skill}
                 </span>
               ))}
@@ -310,7 +309,7 @@ export default function StepReview({ onBack }) {
             <p className="text-xs font-medium text-ink mb-1.5">Certifications</p>
             <div className="flex flex-wrap gap-1.5">
               {formData.certifications?.map(cert => (
-                <span key={cert} className="px-2 py-1 bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+                <span key={cert} className="px-2 py-1 bg-amber-50 border border-amber-200 text-amber-900 text-xs break-all">
                   {cert}
                 </span>
               ))}
@@ -321,19 +320,19 @@ export default function StepReview({ onBack }) {
 
       {/* Experience Section */}
       {formData.experiences?.length > 0 && (
-        <div className="border border-ink-200 p-5 mb-4 bg-white">
+        <div className="border border-ink-200 p-4 sm:p-5 mb-4 bg-white overflow-hidden">
           <p className="text-xs uppercase tracking-wide font-semibold text-ink-400 mb-3 flex items-center gap-2">
             <Briefcase size={12} />
             Work Experience
           </p>
           {formData.experiences.map((exp, idx) => (
             <div key={exp.id || idx} className="mb-3 pb-3 border-b border-ink-100 last:mb-0 last:pb-0 last:border-0">
-              <p className="text-sm font-medium text-ink">{exp.jobTitle}</p>
-              <p className="text-xs text-ink-400">
+              <p className="text-sm font-medium text-ink break-words">{exp.jobTitle}</p>
+              <p className="text-xs text-ink-400 break-words mt-0.5">
                 {exp.company} · {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
               </p>
               {exp.description && (
-                <p className="text-xs text-ink-400 mt-1">{exp.description}</p>
+                <p className="text-xs text-ink-400 mt-1 break-words">{exp.description}</p>
               )}
             </div>
           ))}
@@ -341,7 +340,7 @@ export default function StepReview({ onBack }) {
       )}
 
       {/* Documents Section */}
-      <div className="border border-ink-200 p-5 mb-5 bg-white">
+      <div className="border border-ink-200 p-4 sm:p-5 mb-5 bg-white overflow-hidden">
         <p className="text-xs uppercase tracking-wide font-semibold text-ink-400 mb-3">Documents & Links</p>
         <ReviewRow label="Resume" value={formData.resume?.name || 'Attached'} />
         {formData.githubUrl && <ReviewRow label="GitHub" value={formData.githubUrl} />}
@@ -353,15 +352,21 @@ export default function StepReview({ onBack }) {
         <CaptchaBox onVerify={setVerified} />
       </div>
 
-      <div className="flex justify-between pt-2">
-        <button type="button" onClick={onBack} className="btn-outline" disabled={submitting}>
+      {/* Buttons: stack vertically on mobile */}
+      <div className="flex flex-col-reverse sm:flex-row justify-between items-stretch sm:items-center gap-3 pt-2">
+        <button
+          type="button"
+          onClick={onBack}
+          className="btn-outline w-full sm:w-auto"
+          disabled={submitting}
+        >
           ← Back
         </button>
         <button
           type="button"
           onClick={handleSubmit}
           disabled={!verified || submitting}
-          className="btn-teal flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed px-8"
+          className="btn-teal flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed px-6 sm:px-8 w-full sm:w-auto"
         >
           {submitting
             ? <><Loader2 size={14} className="animate-spin" /> Submitting...</>
